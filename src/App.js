@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 const TodoDummyData = [
   {
@@ -49,29 +49,60 @@ const TodoDummyData = [
 ];
 
 export default function App() {
-  const [Text, setText] = useState('');
+  const [FirstText, setFirstText] = useState('');
+  const [SecondText, setSecondText] = useState('');
+  const [ThirdText, setThirdText] = useState('');
+  const [Todos, setTodos] = useState(TodoDummyData);
+  const firstInput = useRef(null);
 
-  const changeText = (e) => {
-    console.log(e.target.value);
-    setText(e.target.value);
+  const changeFirstText = (e) => {
+    setFirstText(e.currentTarget.value);
   };
-  const onClickButton = () => {};
+  const changeSecondText = (e) => {
+    setSecondText(e.currentTarget.value);
+  };
+
+  const changeThirdText = (e) => {
+    setThirdText(e.currentTarget.value);
+  };
+
+  const addFirstTodo = () => {
+    if (!FirstText) {
+      alert('텍스트를 입력해주세요');
+      firstInput.current.focus();
+      return false;
+    }
+    setTodos([
+      ...Todos,
+      { oneDepthId: Todos.length + 1, oneDepthTitle: FirstText },
+    ]);
+  };
+
+  const addSecondTodo = (e) => {};
+
+  const addThirdTodo = () => {};
 
   const TodoList = () => {
-    return TodoDummyData.map((firstData) => {
+    return Todos.map((firstData) => {
+      console.log(firstData);
+
       return (
-        <li key={firstData.oneDepthId}>
-          {firstData.oneDepthTitle}
+        <li key={firstData?.oneDepthId} data-id={firstData?.oneDepthId}>
+          {firstData?.oneDepthTitle}
+          <input onChange={changeSecondText} />
+          <button onClick={addSecondTodo}>확인</button>
           <ul>
-            {firstData.twoDepth.map((secondData) => {
+            {firstData?.twoDepth?.map((secondData) => {
               return (
-                <li key={secondData.twoDepthId}>
-                  {secondData.twoDepthTitle}
+                <li key={secondData?.twoDepthId}>
+                  {secondData?.twoDepthTitle}
+                  <input onChange={changeThirdText} />
+                  <button onClick={addThirdTodo}>확인</button>
                   <ul>
                     {secondData?.threeDepth?.length > 0 &&
-                      secondData.threeDepth.map((thirdData) => (
-                        <li key={thirdData.threeDepthId}>
-                          {thirdData.threeDepthTitle}
+                      secondData?.threeDepth.map((thirdData) => (
+                        <li key={thirdData?.threeDepthId}>
+                          {thirdData?.threeDepthTitle}
                         </li>
                       ))}
                   </ul>
@@ -88,10 +119,8 @@ export default function App() {
     <div className='App'>
       <h1>To-do</h1>
       <div>
-        <input onChange={changeText} />
-        <input onChange={changeText} />
-        <input onChange={changeText} />
-        <button onClick={onClickButton}>확인</button>
+        <input onChange={changeFirstText} ref={firstInput} />
+        <button onClick={addFirstTodo}>확인</button>
       </div>
       <ul>{TodoList()}</ul>
     </div>
