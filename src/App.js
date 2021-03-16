@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 const TodoDummyData = [
   {
@@ -53,6 +53,7 @@ export default function App() {
   const [SecondText, setSecondText] = useState('');
   const [ThirdText, setThirdText] = useState('');
   const [Todos, setTodos] = useState(TodoDummyData);
+  const [SecondDepthTodos, setSecondDepthTodos] = useState([]);
   const firstInput = useRef(null);
 
   const changeFirstText = (e) => {
@@ -78,7 +79,22 @@ export default function App() {
     ]);
   };
 
-  const addSecondTodo = (e) => {};
+  const addSecondTodo = useCallback((e) => {
+    console.log('id', Number(e.target.parentNode.dataset.id), 'SecondText', SecondText);
+    if (!SecondText) {
+      alert('텍스트를 입력해주세요');
+      return false;
+    }
+    Todos.map(todo => {
+      if (Number(todo.oneDepthId) === Number(e.target.parentNode.dataset.id)) {
+        let inputTodo = todo.twoDepth.concat({ twoDepthId: todo.twoDepth.length + 1, twoDepthTitle: SecondText });
+        setSecondDepthTodos(inputTodo);
+        console.log('Todos', inputTodo)
+      }
+    });
+    
+    
+  });
 
   const addThirdTodo = () => {};
 
@@ -98,14 +114,14 @@ export default function App() {
                   {secondData?.twoDepthTitle}
                   <input onChange={changeThirdText} />
                   <button onClick={addThirdTodo}>확인</button>
-                  <ul>
+                  {/* <ul>
                     {secondData?.threeDepth?.length > 0 &&
                       secondData?.threeDepth.map((thirdData) => (
                         <li key={thirdData?.threeDepthId}>
                           {thirdData?.threeDepthTitle}
                         </li>
                       ))}
-                  </ul>
+                  </ul> */}
                 </li>
               );
             })}
