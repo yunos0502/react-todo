@@ -1,144 +1,125 @@
-import { useCallback, useRef, useState } from 'react';
-
-const TodoDummyData = [
-  {
-    oneDepthId: 1,
-    oneDepthTitle: 'Buy',
-    twoDepth: [
-      {
-        twoDepthId: 1,
-        twoDepthTitle: 'Groceries',
-        threeDepth: [],
-      },
-      {
-        twoDepthId: 2,
-        twoDepthTitle: 'Outfit',
-        threeDepth: [
-          {
-            threeDepthId: 1,
-            threeDepthTitle: 'Apples',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    oneDepthId: 2,
-    oneDepthTitle: 'Study',
-    twoDepth: [
-      {
-        twoDepthId: 1,
-        twoDepthTitle: 'React',
-      },
-      {
-        twoDepthId: 2,
-        twoDepthTitle: 'Redux',
-        threeDepth: [
-          {
-            threeDepthId: 1,
-            threeDepthTitle: 'Action',
-          },
-          {
-            threeDepthId: 2,
-            threeDepthTitle: 'Reducer',
-          },
-        ],
-      },
-    ],
-  },
-];
+import { useState } from 'react';
 
 export default function App() {
-  const [FirstText, setFirstText] = useState('');
-  const [SecondText, setSecondText] = useState('');
-  const [ThirdText, setThirdText] = useState('');
-  const [Todos, setTodos] = useState(TodoDummyData);
-  const [SecondDepthTodos, setSecondDepthTodos] = useState([]);
-  const firstInput = useRef(null);
-
-  const changeFirstText = (e) => {
-    setFirstText(e.currentTarget.value);
-  };
-  const changeSecondText = (e) => {
-    setSecondText(e.currentTarget.value);
-  };
-
-  const changeThirdText = (e) => {
-    setThirdText(e.currentTarget.value);
-  };
-
-  const addFirstTodo = () => {
-    if (!FirstText) {
-      alert('텍스트를 입력해주세요');
-      firstInput.current.focus();
-      return false;
+  const TodoDummyData = [
+    {
+      todoId: 1,
+      description: "Buy",
+      parentId: null,
+      depth: 1
+    },
+    {
+      todoId: 2,
+      description: "Study",
+      parentId: null,
+      depth: 1
+    },
+    {
+      todoId: 3,
+      description: "Groceries",
+      parentId: 1,
+      depth: 2
+    },
+    {
+      todoId: 4,
+      description: "Outfit",
+      parentId: 1,
+      depth: 2
+    },
+    {
+      todoId: 5,
+      description: "React",
+      parentId: 2,
+      depth: 2
+    },
+    {
+      todoId: 6,
+      description: "Redux",
+      parentId: 2,
+      depth: 2
+    },
+    {
+      todoId: 7,
+      description: "Apples",
+      parentId: 4,
+      depth: 3
+    },
+    {
+      todoId: 8,
+      description: "Action",
+      parentId: 6,
+      depth: 3
+    },
+    {
+      todoId: 9,
+      description: "Reducer",
+      parentId: 6,
+      depth: 3
     }
-    setTodos([
-      ...Todos,
-      { oneDepthId: Todos.length + 1, oneDepthTitle: FirstText },
-    ]);
+  ];
+
+  const [inputText, setInputText] = useState("");
+  const [todoList, setTodoList] = useState(TodoDummyData);
+
+  const thirdDepth = todoList
+    .filter((todo) => todo.depth === 3)
+    .map((todo) => todo);
+
+  const secondDepth = todoList
+    .filter((todo) => todo.depth === 2)
+    .map((todo) => todo);
+
+  const Todos = todoList
+    .filter((todo) => todo.depth === 1)
+    .map((todo) => (
+      <li key={todo.todoId}>
+        {todo.description}
+        <ul>
+          {secondDepth
+            .filter((second) => second.parentId === todo.todoId)
+            .map((second) => (
+              <li key={second.todoId}>
+                {second.description}
+                <ul>
+                  {thirdDepth
+                    .filter((third) => third.parentId === second.todoId)
+                    .map((third) => (
+                      <li key={third.todoId}>{third.description}</li>
+                    ))}
+                </ul>
+              </li>
+            ))}
+        </ul>
+      </li>
+    ));
+
+  const inputTodo = (e) => {
+    setInputText(e.currentTarget.value);
   };
 
-  const addSecondTodo = useCallback((e) => {
-    console.log('id', Number(e.target.parentNode.dataset.id), 'SecondText', SecondText);
-    if (!SecondText) {
-      alert('텍스트를 입력해주세요');
-      return false;
-    }
-    Todos.map(todo => {
-      if (Number(todo.oneDepthId) === Number(e.target.parentNode.dataset.id)) {
-        let inputTodo = todo.twoDepth.concat({ twoDepthId: todo.twoDepth.length + 1, twoDepthTitle: SecondText });
-        setSecondDepthTodos(inputTodo);
-        console.log('Todos', inputTodo)
+  const inputTodoHandler = (e) => {
+    let depth = Number(e.target.dataset.depth);
+    let parentId = Number(e.target.dataset.parentid) || null;
+
+    setTodoList([
+      ...todoList,
+      {
+        todoId: todoList.length + 1,
+        description: inputText,
+        parentId: parentId,
+        depth: depth
       }
-    });
-    
-    
-  });
-
-  const addThirdTodo = () => {};
-
-  const TodoList = () => {
-    return Todos.map((firstData) => {
-      console.log(firstData);
-
-      return (
-        <li key={firstData?.oneDepthId} data-id={firstData?.oneDepthId}>
-          {firstData?.oneDepthTitle}
-          <input onChange={changeSecondText} />
-          <button onClick={addSecondTodo}>확인</button>
-          <ul>
-            {firstData?.twoDepth?.map((secondData) => {
-              return (
-                <li key={secondData?.twoDepthId}>
-                  {secondData?.twoDepthTitle}
-                  <input onChange={changeThirdText} />
-                  <button onClick={addThirdTodo}>확인</button>
-                  {/* <ul>
-                    {secondData?.threeDepth?.length > 0 &&
-                      secondData?.threeDepth.map((thirdData) => (
-                        <li key={thirdData?.threeDepthId}>
-                          {thirdData?.threeDepthTitle}
-                        </li>
-                      ))}
-                  </ul> */}
-                </li>
-              );
-            })}
-          </ul>
-        </li>
-      );
-    });
+    ]);
   };
 
   return (
     <div className='App'>
       <h1>To-do</h1>
-      <div>
-        <input onChange={changeFirstText} ref={firstInput} />
-        <button onClick={addFirstTodo}>확인</button>
-      </div>
-      <ul>{TodoList()}</ul>
+      <input onChange={inputTodo} />
+      <button onClick={inputTodoHandler} data-depth="1">
+        확인
+      </button>
+      <ul>{todoList.length > 0 && Todos}</ul>
     </div>
   );
 }
