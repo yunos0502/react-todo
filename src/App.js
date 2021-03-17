@@ -61,6 +61,29 @@ export default function App() {
   const [inputText, setInputText] = useState("");
   const [todoList, setTodoList] = useState(TodoDummyData);
 
+  const inputTodo = (e) => {
+    setInputText(e.currentTarget.value);
+  };
+
+  const inputTodoHandler = (e) => {
+    let depth = Number(e.target.dataset.depth);
+    let parentId = Number(e.target.dataset.parentid) || null;
+
+    console.log(depth, parentId);
+
+    setTodoList([
+      ...todoList,
+      {
+        todoId: todoList.length + 1,
+        description: inputText,
+        parentId: parentId,
+        depth: depth
+      }
+    ]);
+
+    setInputText("");
+  };
+
   const thirdDepth = todoList
     .filter((todo) => todo.depth === 3)
     .map((todo) => todo);
@@ -74,12 +97,28 @@ export default function App() {
     .map((todo) => (
       <li key={todo.todoId}>
         {todo.description}
+        <input onChange={inputTodo} />
+        <button
+          onClick={inputTodoHandler}
+          data-depth="2"
+          data-parentid={todo.todoId}
+        >
+          확인
+        </button>
         <ul>
           {secondDepth
             .filter((second) => second.parentId === todo.todoId)
             .map((second) => (
               <li key={second.todoId}>
                 {second.description}
+                <input onChange={inputTodo} />
+                <button
+                  onClick={inputTodoHandler}
+                  data-depth="3"
+                  data-parentid={second.todoId}
+                >
+                  확인
+                </button>
                 <ul>
                   {thirdDepth
                     .filter((third) => third.parentId === second.todoId)
@@ -92,25 +131,6 @@ export default function App() {
         </ul>
       </li>
     ));
-
-  const inputTodo = (e) => {
-    setInputText(e.currentTarget.value);
-  };
-
-  const inputTodoHandler = (e) => {
-    let depth = Number(e.target.dataset.depth);
-    let parentId = Number(e.target.dataset.parentid) || null;
-
-    setTodoList([
-      ...todoList,
-      {
-        todoId: todoList.length + 1,
-        description: inputText,
-        parentId: parentId,
-        depth: depth
-      }
-    ]);
-  };
 
   return (
     <div className='App'>
