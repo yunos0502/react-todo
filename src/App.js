@@ -71,6 +71,7 @@ export default function App() {
     let parentId = Number(e.target.dataset.parentid) || null;
 
     console.log(depth, parentId);
+    console.log(e.target);
 
     setTodoList([
       ...todoList,
@@ -82,7 +83,8 @@ export default function App() {
       }
     ]);
 
-    setInputText("");
+    setInputText('');
+    e.target.previousSibling.value = '';
   };
 
   const thirdDepth = todoList
@@ -97,34 +99,38 @@ export default function App() {
     .filter((todo) => todo.depth === 1)
     .map((todo) => (
       <li key={todo.todoId}>
-        {todo.description}
-        <input onChange={inputTodo} />
-        <button
-          onClick={inputTodoHandler}
-          data-depth="2"
-          data-parentid={todo.todoId}
-        >
-          확인
-        </button>
+        <label htmlFor={`secondId${todo.todoId}`}>
+          <input type="checkbox" name={`secondId${todo.todoId}`} id={`secondId${todo.todoId}`} />
+          {todo.description}
+        </label>
+        <InputText>
+          <input onChange={inputTodo} placeholder="할 일을 입력해주세요 :)" />
+          <button onClick={inputTodoHandler} data-depth="2" data-parentid={todo.todoId} />
+        </InputText>
+        
         <ul>
           {secondDepth
             .filter((second) => second.parentId === todo.todoId)
             .map((second) => (
-              <li key={second.todoId}>
-                {second.description}
-                <input onChange={inputTodo} />
-                <button
-                  onClick={inputTodoHandler}
-                  data-depth="3"
-                  data-parentid={second.todoId}
-                >
-                  확인
-                </button>
+              <li key={second.todoId} className="secondTodoItem">
+                <label htmlFor={`secondId${second.todoId}`}>
+                  <input type="checkbox" name={`secondId${second.todoId}`} id={`secondId${second.todoId}`} />
+                  {second.description}
+                </label>
+                <InputText>
+                  <input onChange={inputTodo} placeholder="할 일을 입력해주세요 :)" />
+                  <button onClick={inputTodoHandler} data-depth="3" data-parentid={second.todoId} />
+                </InputText>
                 <ul>
                   {thirdDepth
                     .filter((third) => third.parentId === second.todoId)
                     .map((third) => (
-                      <li key={third.todoId}>{third.description}</li>
+                      <li key={third.todoId} className="thirdTodoItem">
+                        <label htmlFor={`secondId${third.todoId}`}>
+                          <input type="checkbox" name={`secondId${third.todoId}`} id={`secondId${third.todoId}`} />
+                          {third.description}
+                        </label>
+                      </li>
                     ))}
                 </ul>
               </li>
@@ -138,10 +144,8 @@ export default function App() {
       <Layout>
         <h1>Todo List</h1>
         <InputText>
-          <input onChange={inputTodo} />
-          <button onClick={inputTodoHandler} data-depth="1">
-            확인
-          </button>
+          <input onChange={inputTodo} placeholder="할 일을 입력해주세요 :)" />
+          <button onClick={inputTodoHandler} data-depth="1" />
         </InputText>
         <List>{todoList.length > 0 && Todos}</List>
       </Layout>
@@ -157,7 +161,11 @@ const Layout = styled.div`
   max-width: 500px;
 
   h1 {
+    width: 95%;
+    margin: auto;
     text-align: center;
+    font-size: 1.5rem;
+    color: #202020;
   }
 `;
 
@@ -165,26 +173,81 @@ const InputText = styled.div`
   width: 95%;
   display: flex;
   height: 40px;
-  background-color: #ececec;
   margin: 1rem auto;
+  align-items: center;
 
   input {
     flex: 1;
     border: 0;
     background-color: #fff;
-    border: 1px solid #ececec;
+    border: 0;
+    border-bottom: 1px solid #ececec;
     padding: 0 1rem;
+    width: calc(100% - 40px);
+    line-height: 39px;
   }
   button {
-    width: 20%;
-    background-color: #ececec;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid #F1B24A;
+    background: #F1B24A url('https://icongr.am/clarity/add.svg?size=128&color=FFFFFF') no-repeat 50% / 20px;
   }
 `;
 
 const List = styled.ul`
-  border: 1px solid #ececec;
   padding: 1rem;
-  /* box-shadow: 1px 1px 4px 0px rgb(0 0 0 / 20%); */
   width: 95%;
   margin: 0 auto 5px;
+  background-color: #ececec;
+  color: #4D774E;
+
+  & > li {
+    border: 1px solid #ececec;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 1px 1px 4px 0px rgb(0 0 0 / 20%);
+    margin-bottom: 1rem;
+    background-color: #fff;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+  .secondTodoItem {
+    padding-left: 1rem;
+
+    ul {
+      margin-bottom: 1rem;
+
+      li {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+  .thirdTodoItem {
+    padding-left: 2rem;
+  }
+  label {
+    position: relative;
+    padding-left: 22px;
+
+    &::before, &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+    }
+    &::before {
+      border: 1px solid #4D774E;
+      border-radius: 3px;
+      background-color: #fff;
+      width: 15px;
+      height: 15px;
+    }
+    &::after {}
+
+    input {
+      display: none;
+    }
+  }
 `;
