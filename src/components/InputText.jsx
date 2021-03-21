@@ -20,7 +20,7 @@ const Wrap = styled.div`
   width: 95%;
   display: flex;
   height: 40px;
-  margin: 1rem auto 0;
+  margin: 0.5rem auto 0;
   align-items: center;
 
   input {

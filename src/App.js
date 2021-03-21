@@ -7,65 +7,7 @@ import Loading from "./components/Loading";
 import "./style.css";
 
 export default function App() {
-  // const TodoDummyData = [
-  //   {
-  //     todoId: 1,
-  //     description: "Buy",
-  //     parentId: null,
-  //     depth: 1
-  //   },
-  //   {
-  //     todoId: 2,
-  //     description: "Study",
-  //     parentId: null,
-  //     depth: 1
-  //   },
-  //   {
-  //     todoId: 3,
-  //     description: "Groceries",
-  //     parentId: 1,
-  //     depth: 2
-  //   },
-  //   {
-  //     todoId: 4,
-  //     description: "Outfit",
-  //     parentId: 1,
-  //     depth: 2
-  //   },
-  //   {
-  //     todoId: 5,
-  //     description: "React",
-  //     parentId: 2,
-  //     depth: 2
-  //   },
-  //   {
-  //     todoId: 6,
-  //     description: "Redux",
-  //     parentId: 2,
-  //     depth: 2
-  //   },
-  //   {
-  //     todoId: 7,
-  //     description: "Apples",
-  //     parentId: 4,
-  //     depth: 3
-  //   },
-  //   {
-  //     todoId: 8,
-  //     description: "Action",
-  //     parentId: 6,
-  //     depth: 3
-  //   },
-  //   {
-  //     todoId: 9,
-  //     description: "Reducer",
-  //     parentId: 6,
-  //     depth: 3
-  //   }
-  // ];
-
   const [inputText, setInputText] = useState("");
-  // const [todoList, setTodoList] = useState(TodoDummyData);
   const [todoList, setTodoList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -103,8 +45,6 @@ export default function App() {
 
     setInputText("");
     target.firstChild.value = "";
-
-    console.log(target, todoList);
   };
 
   const enterTodoHandler = (e) => {
@@ -116,6 +56,15 @@ export default function App() {
   const clickTodoHandler = (e) => {
     todoHandler(e);
   };
+
+  const checkedTodos = (e) => {
+    e.preventDefault();
+    
+    const standardChecked = e.target.parentNode.parentNode.querySelector('input[type="checkbox"').checked;
+    const selectTodoList = e.target.parentNode.parentNode.querySelectorAll('input[type="checkbox"');
+
+    Object.values(selectTodoList).map(item => item.checked = !standardChecked);
+  }
 
   const thirdDepth = todoList
     .filter((todo) => todo.depth === 3)
@@ -129,13 +78,15 @@ export default function App() {
     .filter((todo) => todo.depth === 1)
     .map((todo) => (
       <li key={todo.todoId} className="firstTodoItem">
-        <div>
+        <div onClick={checkedTodos}>
           <input
             type="checkbox"
-            name={todo.description}
-            id={todo.description}
+            name={todo.description + todo.todoId}
+            id={todo.description + todo.todoId}
           />
-          <label htmlFor={todo.description}>{todo.description}</label>
+          <label htmlFor={todo.description + todo.todoId}>
+            {todo.description}
+          </label>
         </div>
         <InputText
           depth="2"
@@ -150,13 +101,13 @@ export default function App() {
             .filter((second) => second.parentId === todo.todoId)
             .map((second) => (
               <li key={second.todoId} className="secondTodoItem">
-                <div>
+                <div onClick={checkedTodos}>
                   <input
                     type="checkbox"
-                    name={second.description}
-                    id={second.description}
+                    name={second.description + second.todoId}
+                    id={second.description + second.todoId}
                   />
-                  <label htmlFor={second.description}>
+                  <label htmlFor={second.description + second.todoId}>
                     {second.description}
                   </label>
                 </div>
@@ -175,10 +126,10 @@ export default function App() {
                         <div>
                           <input
                             type="checkbox"
-                            name={third.description}
-                            id={third.description}
+                            name={third.description + third.todoId}
+                            id={third.description + third.todoId}
                           />
-                          <label htmlFor={third.description}>
+                          <label htmlFor={third.description + third.todoId}>
                             {third.description}
                           </label>
                         </div>

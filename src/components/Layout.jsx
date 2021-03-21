@@ -18,7 +18,7 @@ const Wrap = styled.div`
 
   h1 {
     width: 95%;
-    margin: auto;
+    margin: 1rem auto;
     text-align: center;
     font-size: 1.5rem;
     color: #202020;
